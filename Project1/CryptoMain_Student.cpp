@@ -174,7 +174,7 @@ FILE *openInputFile(char *filename)
 	FILE *fptr;
 	long sz;
 
-	char dir[MAX_PATH];
+	wchar_t dir[MAX_PATH];
 
 	fptr = fopen(filename, "rb");
 	if(fptr == NULL)
