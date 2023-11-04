@@ -13,7 +13,24 @@ void encryptData_01(char *data, int datalength)
 
 	__asm
 	{
-		nop
+		xor ecx, ecx
+		lea esi, gkey
+		mov edi, data
+
+
+		CHECK_NEXT :
+		mov al, 0
+		cmp ecx, datalength
+		je DONE
+		mov bl, byte ptr[edi + ecx]
+		mov al, byte ptr[esi + ecx]
+		xor bl, al
+		mov byte ptr[edi + ecx], bl
+		inc ecx
+		jmp CHECK_NEXT
+
+		DONE :
+
 	}
 
 	return;
