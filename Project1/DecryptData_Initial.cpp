@@ -16,7 +16,7 @@ void decryptData_01(char *data, int sized)
 		lea esi, gkey
 		mov edi, data
 
-
+		//Ortiz is Cheeze
 		CHECK_NEXT :
 		mov al, 0
 		cmp ecx, sized
