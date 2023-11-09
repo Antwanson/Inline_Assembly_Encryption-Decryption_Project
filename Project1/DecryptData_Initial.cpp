@@ -12,23 +12,29 @@ void decryptData_01(char *data, int sized)
 {
 	__asm
 	{
-		xor ecx, ecx
-		lea esi, gkey
-		mov edi, data
+		xor ecx, ecx //clearing the ECX and EAX registers
+		xor eax, eax
 
-		
-		CHECK_NEXT :
-		mov al, 0
-		cmp ecx, sized
+		lea	esi, gPasswordHash //getting starting index
+		mov ah, byte ptr[esi]
+		mov al, byte ptr[esi + 1]
+		lea esi, gkey //getting gkey
+		mov edi, data //getting the actual data
+
+
+
+	CHECK_NEXT:
+		mov bh, 0
+		cmp ecx, sized //seeing if we are at the end of the data
 		je DONE
-		mov bl, byte ptr[edi + ecx]
-		mov al, byte ptr[esi + ecx]
-		xor bl, al
-		mov byte ptr[edi + ecx], bl
-		inc ecx
+		mov bl, byte ptr[edi + ecx] //moves X value into bl
+		mov bh, byte ptr[esi + eax] //moves gkey into bh
+		xor bl, bh
+		mov byte ptr[edi + ecx], bl //writes xor-ed value back into where we got it from
+		inc ecx //counter increment
 		jmp CHECK_NEXT
 
-		DONE :
+	DONE :
 
 	}
 
