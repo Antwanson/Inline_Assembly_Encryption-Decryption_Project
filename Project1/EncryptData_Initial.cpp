@@ -35,8 +35,13 @@ void encryptData_01(char *data, int datalength)
 		inc ecx //counter increment
 		jmp CHECK_NEXT
 
-		DONE :
+			DONE :
 
+		//Start order BEACD 
+
+		//Nibble rotate out
+
+		//Rotate 3 bits left
 	}
 
 	return;
