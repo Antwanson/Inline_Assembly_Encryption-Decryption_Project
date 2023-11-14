@@ -34,8 +34,21 @@ void decryptData_01(char *data, int sized)
 		inc ecx //counter increment
 		jmp CHECK_NEXT
 
-	DONE :
+			DONE :
 
+		//Start order BEACD in REVERSE 
+
+		//Invert Bits
+
+		//Reverse bit order
+
+		//Code Table Swap
+
+		//Rotate 3 bits left
+
+		//Nibble rotate out
+
+		
 	}
 
 	return;

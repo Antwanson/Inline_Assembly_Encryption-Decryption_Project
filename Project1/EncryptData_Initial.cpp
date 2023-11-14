@@ -42,6 +42,12 @@ void encryptData_01(char *data, int datalength)
 		//Nibble rotate out
 
 		//Rotate 3 bits left
+
+		//Code Table Swap
+
+		//Reverse bit order
+
+		//Invert Bits
 	}
 
 	return;
