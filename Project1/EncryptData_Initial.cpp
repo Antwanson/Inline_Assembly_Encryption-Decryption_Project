@@ -15,7 +15,11 @@ void encryptData_01(char *data, int datalength)
 	{
 		xor ecx, ecx //clearing the ECX and EAX registers
 		xor eax, eax
+		xor ebx, ebx
 
+		/***************************************************************************************************************************
+		* M1 Section - commented out to make checking M2 easier */
+		
 		lea	esi, gPasswordHash //getting starting index
 		mov ah, byte ptr[esi]
 		mov al, byte ptr[esi+1]
@@ -37,9 +41,51 @@ void encryptData_01(char *data, int datalength)
 
 			DONE :
 
+		/**************************************************************************************************************************/
+
 		//Start order BEACD 
 
-		//Nibble rotate out
+		/**************************************************************************************************************************
+		/*-----| Nibble rotate out (Encrypt) |-----*/
+
+		mov edi, data //getting the actual data again (starting from beginning) aka ABCD EFGH
+		xor eax,eax
+		xor ebx,ebx
+		xor ecx,ecx
+		clc
+
+		NRO_CHECK_NEXT:
+
+		cmp ecx, datalength //seeing if we are at the end of the data
+		je NRO_DONE
+
+		mov al, byte ptr[edi + ecx] //first nibble   
+		and al,0xF0
+		shl al,1
+		jnc NRO_Post_First_Nibble
+		inc al
+
+		NRO_Post_First_Nibble: //finished first nibble rotation
+		clc
+		mov bl, byte ptr[edi + ecx] //second nibble
+		and bl,0x0F
+		shr bl,1
+		jnc NRO_Post_Second_Nibble
+		add bl,8
+
+		NRO_Post_Second_Nibble : //finished second nibble rotation
+		
+		
+		//Add the nibbles together :)
+		add al,bl
+		mov byte ptr[edi + ecx], al
+		
+		inc ecx
+		jmp NRO_CHECK_NEXT
+
+			NRO_DONE:
+
+		/**************************************************************************************************************************/
 
 		//Rotate 3 bits left
 

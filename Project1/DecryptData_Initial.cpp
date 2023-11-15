@@ -12,8 +12,67 @@ void decryptData_01(char *data, int sized)
 {
 	__asm
 	{
+		//Start order BEACD in REVERSE 
+
+		//Invert Bits
+
+		//Reverse bit order
+
+		//Code Table Swap
+
+		//Rotate 3 bits left
+
+		/**************************************************************************************************************************
+		/*-----| Nibble rotate out (dycrypt) |-----*/
+
+		mov edi, data //getting the actual data again (starting from beginning) aka ABCD EFGH
+		xor eax, eax
+		xor ebx, ebx
+		xor ecx, ecx
+		clc
+
+			NRO_CHECK_NEXT :
+
+		cmp ecx, sized //seeing if we are at the end of the data
+		je NRO_DONE
+
+		mov al, byte ptr[edi + ecx] //first nibble   
+		and al, 0xF0
+		shr al, 5
+		jnc NRO_Post_First_Nibble
+		add al, 8
+
+			NRO_Post_First_Nibble :
+		shl al, 4	//finished first nibble rotation
+
+
+		clc
+		mov bl, byte ptr[edi + ecx] //second nibble
+		and bl, 0x0F
+		shl bl, 5
+		jnc NRO_Post_Second_Nibble
+		add bl, 16
+
+			NRO_Post_Second_Nibble :
+		shr bl, 4	//finished second nibble rotation
+
+
+			//Add the nibbles together :)
+		add al, bl
+		mov byte ptr[edi + ecx], al
+
+		inc ecx
+		jmp NRO_CHECK_NEXT
+
+			NRO_DONE :
+
+		/**************************************************************************************************************************/
+
 		xor ecx, ecx //clearing the ECX and EAX registers
 		xor eax, eax
+		xor ebx, ebx
+		/***************************************************************************************************************************
+		* M1 Section - commented out to make checking M2 easier */
 
 		lea	esi, gPasswordHash //getting starting index
 		mov ah, byte ptr[esi]
@@ -35,19 +94,8 @@ void decryptData_01(char *data, int sized)
 		jmp CHECK_NEXT
 
 			DONE :
-
-		//Start order BEACD in REVERSE 
-
-		//Invert Bits
-
-		//Reverse bit order
-
-		//Code Table Swap
-
-		//Rotate 3 bits left
-
-		//Nibble rotate out
-
+		/***************************************************************************************************************************/
+		
 		
 	}
 
