@@ -12,6 +12,7 @@ void decryptData_01(char *data, int sized)
 {
 	__asm
 	{
+		mov edi, data //getting the actual data
 		//Start order BEACD in REVERSE 
 
 		//Invert Bits
@@ -25,7 +26,7 @@ void decryptData_01(char *data, int sized)
 		/**************************************************************************************************************************
 		/*-----| Nibble rotate out (dycrypt) |-----*/
 
-		mov edi, data //getting the actual data again (starting from beginning) aka ABCD EFGH
+		//mov edi, data //getting the actual data again (starting from beginning) aka ABCD EFGH
 		xor eax, eax
 		xor ebx, ebx
 		xor ecx, ecx
@@ -78,7 +79,7 @@ void decryptData_01(char *data, int sized)
 		mov ah, byte ptr[esi]
 		mov al, byte ptr[esi + 1]
 		lea esi, gkey //getting gkey
-		mov edi, data //getting the actual data
+		
 
 
 

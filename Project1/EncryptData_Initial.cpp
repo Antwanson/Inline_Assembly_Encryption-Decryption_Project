@@ -16,7 +16,7 @@ void encryptData_01(char *data, int datalength)
 		xor ecx, ecx //clearing the ECX and EAX registers
 		xor eax, eax
 		xor ebx, ebx
-
+		mov edi, data //getting the actual data
 		/***************************************************************************************************************************
 		* M1 Section - commented out to make checking M2 easier */
 		
@@ -24,7 +24,7 @@ void encryptData_01(char *data, int datalength)
 		mov ah, byte ptr[esi]
 		mov al, byte ptr[esi+1]
 		lea esi, gkey //getting gkey
-		mov edi, data //getting the actual data
+		
 		
 		
 
@@ -48,7 +48,7 @@ void encryptData_01(char *data, int datalength)
 		/**************************************************************************************************************************
 		/*-----| Nibble rotate out (Encrypt) |-----*/
 
-		mov edi, data //getting the actual data again (starting from beginning) aka ABCD EFGH
+		//mov edi, data //getting the actual data again (starting from beginning) aka ABCD EFGH
 		xor eax,eax
 		xor ebx,ebx
 		xor ecx,ecx
