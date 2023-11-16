@@ -89,6 +89,20 @@ void encryptData_01(char *data, int datalength)
 
 		//Rotate 3 bits left
 
+		R3BL_CHECK_NEXT:
+
+		cmp ecx, datalength
+		je R3BL_DONE
+
+		mov al, byte ptr[edi + ecx]
+		ror al, 3
+		mov byte ptr[edi + ecx], al
+
+		inc ecx
+		jmp R3BL_CHECK_NEXT
+
+			R3BL_DONE :
+
 		//Code Table Swap
 
 		//Reverse bit order
