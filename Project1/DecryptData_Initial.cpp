@@ -23,6 +23,19 @@ void decryptData_01(char *data, int sized)
 
 		//Rotate 3 bits left
 
+		R3BL_CHECK_NEXT:
+		cmp ecx, sized
+		je R3BL_DONE
+
+		mov al, byte ptr[edi + ecx]
+		rol al, 3
+		mov byte ptr[edi + ecx], al
+
+		inc ecx
+		jmp R3BL_CHECK_NEXT
+
+			R3BL_DONE :
+
 		/**************************************************************************************************************************
 		/*-----| Nibble rotate out (dycrypt) |-----*/
 
