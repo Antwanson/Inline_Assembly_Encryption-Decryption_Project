@@ -63,7 +63,7 @@ void encryptData_01(char *data, int datalength)
 		and al,0xF0
 		shl al,1
 		jnc NRO_Post_First_Nibble
-		inc al
+		add al,16
 
 		NRO_Post_First_Nibble: //finished first nibble rotation
 		clc
