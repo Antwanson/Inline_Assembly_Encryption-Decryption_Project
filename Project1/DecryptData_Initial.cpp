@@ -23,13 +23,15 @@ void decryptData_01(char *data, int sized)
 
 		/**************************************************************************************************************************
 		/*-----| Rotate 3 bits left (Decrypt) |-----*/
-
+		xor ecx, ecx
+		xor eax, eax
 		R3BL_CHECK_NEXT:
 		cmp ecx, sized
 		je R3BL_DONE
 
+		clc
 		mov al, byte ptr[edi + ecx]
-		rol al, 3
+		rcr al, 3
 		mov byte ptr[edi + ecx], al
 
 		inc ecx

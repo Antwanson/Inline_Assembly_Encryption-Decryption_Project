@@ -89,15 +89,17 @@ void encryptData_01(char *data, int datalength)
 
 		/**************************************************************************************************************************
 		/*-----| Rotate 3 bits left (Encrypt) |-----*/
-		
+		xor eax, eax
+		xor ecx, ecx
 
 		R3BL_CHECK_NEXT:
 
 		cmp ecx, datalength
 		je R3BL_DONE
 
+		clc
 		mov al, byte ptr[edi + ecx]
-		ror al, 3
+		rcl al, 3
 		mov byte ptr[edi + ecx], al
 
 		inc ecx
