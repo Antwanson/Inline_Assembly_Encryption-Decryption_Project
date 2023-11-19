@@ -91,16 +91,29 @@ void encryptData_01(char *data, int datalength)
 		/*-----| Rotate 3 bits left (Encrypt) |-----*/
 		xor eax, eax
 		xor ecx, ecx
+		
 
 		R3BL_CHECK_NEXT:
-
-		cmp ecx, datalength
+		cmp ecx, datalength //sees if we are at the end of the data
 		je R3BL_DONE
+		xor ebx, ebx //uses bl as second counter
+		mov bl, 3 //3 shifts
+		mov al, byte ptr[edi + ecx] //moves byte into al
+			
+			R3BL_NextShift: //first shift
+			cmp bl, 0
+			je R3BL_SHIFT_COMPLETE // if all shifts are done jump to writing to memory
 
-		clc
-		mov al, byte ptr[edi + ecx]
-		rcl al, 3
-		mov byte ptr[edi + ecx], al
+		shl al, 1 //shift left 1
+		jnc R3BL_NOBIT // if carry flag is 1, adds 1 to al effectively rotating the bit to the other side
+		inc al
+			R3BL_NOBIT: // if there is not bit to carry
+		dec bl
+		jmp R3BL_NextShift //repeats
+
+			R3BL_SHIFT_COMPLETE: //means the shifting is complete in this byte
+
+		mov byte ptr[edi + ecx], al //write result to memory
 
 		inc ecx
 		jmp R3BL_CHECK_NEXT
