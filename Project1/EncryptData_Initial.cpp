@@ -88,7 +88,7 @@ void encryptData_01(char *data, int datalength)
 		/**************************************************************************************************************************/
 
 		/**************************************************************************************************************************
-		/*-----| Rotate 3 bits left (Encrypt) CREDIT: Marinella & Anthony |-----*/
+		/*-----| Rotate 3 bits left (Encrypt) CREDIT: Marianela & Anthony |-----*/
 		xor eax, eax
 		xor ecx, ecx
 		
@@ -159,7 +159,7 @@ void encryptData_01(char *data, int datalength)
 
 			reverse_order_loop:
 		cmp ecx, datalength // check if end of data is reached
-		je invert_bits_done // if yes, jump to invert bits
+		je reverse_bits_done // if yes, jump to invert bits
 		
 		//reverse bit order (section per byte)
 		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -177,9 +177,30 @@ void encryptData_01(char *data, int datalength)
 		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 		inc ecx //increment counter
 		jmp reverse_order_loop //repeat for next element
-			invert_bits_done: 
+			reverse_bits_done:
 		/**************************************************************************************************************************/
-		//Invert Bits
+		
+		/**************************************************************************************************************************
+		/*-----| Inverse Bits (Encrypt) CREDIT: Christina & Anthony |-----*/
+		xor eax, eax
+		xor ecx, ecx //using this instead of mov ecx,0 ~ Anthony
+		xor ebx, ebx
+		xor edx, edx
+
+			
+			invert_bits_loop:
+		cmp ecx, datalength //check if end of data is reached
+		je invert_bits_done
+		//invert bits 0,2,4,7 (section per byte)
+		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		mov al, byte ptr[edi + ecx]
+		xor al, 0x95
+		mov byte ptr[edi + ecx], al
+		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		inc ecx //increment counter
+		jmp invert_bits_loop //repeat for next element
+		invert_bits_done :
+		/**************************************************************************************************************************/
 	}
 
 	return;

@@ -15,7 +15,27 @@ void decryptData_01(char *data, int sized)
 		mov edi, data //getting the actual data
 		//Start order BEACD in REVERSE 
 
-		//Invert Bits
+		/**************************************************************************************************************************
+		/*-----| Inverse Bits (Encrypt) CREDIT: Christina & Anthony |-----*/
+		xor eax, eax
+		xor ecx, ecx //using this instead of mov ecx,0 ~ Anthony
+		xor ebx, ebx
+		xor edx, edx
+
+
+		invert_bits_loop :
+		cmp ecx, sized //check if end of data is reached
+			je invert_bits_done
+			//invert bits 0,2,4,7 (section per byte)
+			//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+			mov al, byte ptr[edi + ecx]
+			xor al, 0x95
+			mov byte ptr[edi + ecx], al
+			//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+			inc ecx //increment counter
+			jmp invert_bits_loop //repeat for next element
+			invert_bits_done :
+		/**************************************************************************************************************************/
 
 		/**************************************************************************************************************************
 		/*-----| Reverse Bit Order (Decrypt) CREDIT: Christina & Anthony |-----*/
@@ -26,7 +46,7 @@ void decryptData_01(char *data, int sized)
 
 		reverse_order_loop :
 		cmp ecx, sized // check if end of data is reached
-		je invert_bits_done // if yes, jump to invert bits
+		je reverse_bits_done // if yes, jump to invert bits
 
 		//reverse bit order (section per byte)
 		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -44,11 +64,11 @@ void decryptData_01(char *data, int sized)
 
 		inc ecx //increment counter
 		jmp reverse_order_loop //repeat for next element
-			invert_bits_done :
+			reverse_bits_done :
 		/**************************************************************************************************************************/
 
 		/**************************************************************************************************************************
-		/*-----| Code Table Swap (Decrypt) |-----*/
+		/*-----| Code Table Swap (Decrypt) CREDIT: Anthony |-----*/
 		xor eax, eax
 		xor ecx, ecx
 		xor ebx, ebx
@@ -77,7 +97,7 @@ void decryptData_01(char *data, int sized)
 		/**************************************************************************************************************************/
 
 		/**************************************************************************************************************************
-		/*-----| Rotate 3 bits left (Decrypt) |-----*/
+		/*-----| Rotate 3 bits left (Decrypt) Credit: Marianela & Anthony |-----*/
 		xor ecx, ecx
 		xor eax, eax
 
@@ -111,7 +131,7 @@ void decryptData_01(char *data, int sized)
 		/**************************************************************************************************************************/
 
 		/**************************************************************************************************************************
-		/*-----| Nibble rotate out (dycrypt) |-----*/
+		/*-----| Nibble rotate out (dycrypt) CREDIT: Anthony |-----*/
 
 		//mov edi, data //getting the actual data again (starting from beginning) aka ABCD EFGH
 		xor eax, eax
