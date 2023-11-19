@@ -42,6 +42,43 @@ void encryptData_01(char *data, int datalength)
 			DONE :
 
 		/**************************************************************************************************************************/
+	}
+
+	return;
+} // encryptData_01
+void encryptData_02(char* data, int datalength)
+{
+	__asm
+	{
+		xor ecx, ecx //clearing the ECX and EAX registers
+		xor eax, eax
+		xor ebx, ebx
+		mov edi, data //getting the actual data
+		/***************************************************************************************************************************
+		* M1 Section - commented out to make checking M2 easier */
+
+		lea	esi, gPasswordHash //getting starting index
+		mov ah, byte ptr[esi]
+		mov al, byte ptr[esi + 1]
+		lea esi, gkey //getting gkey
+
+
+
+
+			CHECK_NEXT:
+		mov bh, 0
+		cmp ecx, datalength //seeing if we are at the end of the data
+		je DONE
+		mov bl, byte ptr[edi + ecx] //moves X value into bl
+		mov bh, byte ptr[esi + eax] //moves gkey into bh
+		xor bl, bh
+		mov byte ptr[edi + ecx], bl //writes xor-ed value back into where we got it from
+		inc ecx //counter increment
+		jmp CHECK_NEXT
+
+			DONE :
+
+		/**************************************************************************************************************************/
 
 		//Start order BEACD 
 
@@ -49,41 +86,41 @@ void encryptData_01(char *data, int datalength)
 		/*-----| Nibble rotate out (Encrypt) CREDIT: Anthony |-----*/
 
 		//mov edi, data //getting the actual data again (starting from beginning) aka ABCD EFGH
-		xor eax,eax
-		xor ebx,ebx
-		xor ecx,ecx
+		xor eax, eax
+		xor ebx, ebx
+		xor ecx, ecx
 		clc
 
-		NRO_CHECK_NEXT:
+			NRO_CHECK_NEXT :
 
 		cmp ecx, datalength //seeing if we are at the end of the data
 		je NRO_DONE
 
 		mov al, byte ptr[edi + ecx] //first nibble   
-		and al,0xF0
-		shl al,1
+		and al, 0xF0
+		shl al, 1
 		jnc NRO_Post_First_Nibble
-		add al,16
+		add al, 16
 
-		NRO_Post_First_Nibble: //finished first nibble rotation
+			NRO_Post_First_Nibble: //finished first nibble rotation
 		clc
 		mov bl, byte ptr[edi + ecx] //second nibble
-		and bl,0x0F
-		shr bl,1
+		and bl, 0x0F
+		shr bl, 1
 		jnc NRO_Post_Second_Nibble
-		add bl,8
+		add bl, 8
 
 		NRO_Post_Second_Nibble : //finished second nibble rotation
-		
-		
+
+
 		//Add the nibbles together :)
-		add al,bl
+		add al, bl
 		mov byte ptr[edi + ecx], al
-		
+
 		inc ecx
 		jmp NRO_CHECK_NEXT
 
-			NRO_DONE:
+			NRO_DONE :
 
 		/**************************************************************************************************************************/
 
@@ -91,27 +128,27 @@ void encryptData_01(char *data, int datalength)
 		/*-----| Rotate 3 bits left (Encrypt) CREDIT: Marianela & Anthony |-----*/
 		xor eax, eax
 		xor ecx, ecx
-		
 
-		R3BL_CHECK_NEXT:
+
+			R3BL_CHECK_NEXT :
 		cmp ecx, datalength //sees if we are at the end of the data
 		je R3BL_DONE
 		xor ebx, ebx //uses bl as second counter
 		mov bl, 3 //3 shifts
 		mov al, byte ptr[edi + ecx] //moves byte into al
-			
-			R3BL_NextShift: //first shift
-			cmp bl, 0
-			je R3BL_SHIFT_COMPLETE // if all shifts are done jump to writing to memory
+
+			R3BL_NextShift : //first shift
+		cmp bl, 0
+		je R3BL_SHIFT_COMPLETE // if all shifts are done jump to writing to memory
 
 		shl al, 1 //shift left 1
 		jnc R3BL_NOBIT // if carry flag is 1, adds 1 to al effectively rotating the bit to the other side
 		inc al
-			R3BL_NOBIT: // if there is not bit to carry
+			R3BL_NOBIT : // if there is not bit to carry
 		dec bl
 		jmp R3BL_NextShift //repeats
 
-			R3BL_SHIFT_COMPLETE: //means the shifting is complete in this byte
+			R3BL_SHIFT_COMPLETE : //means the shifting is complete in this byte
 
 		mov byte ptr[edi + ecx], al //write result to memory
 
@@ -128,17 +165,17 @@ void encryptData_01(char *data, int datalength)
 		xor ecx, ecx
 		xor ebx, ebx
 
-			CTS_CHECK_NEXT :
+		CTS_CHECK_NEXT :
 
 		cmp ecx, datalength //seeing if we are at the end of the data
-		je CTS_DONE
+			je CTS_DONE
 
 			//Operations to do per byte
 		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 		movzx eax, byte ptr[edi + ecx] //puts byte of plaintext into full register zero extended
 		lea ebx, gEncodeTable //gets the decrypt swap table
 
-		movzx eax, [ebx+eax] //swap the value
+		movzx eax, [ebx + eax] //swap the value
 
 		mov byte ptr[edi + ecx], al //write back to memory
 		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -157,29 +194,29 @@ void encryptData_01(char *data, int datalength)
 		xor ebx, ebx
 		xor edx, edx
 
-			reverse_order_loop:
+			reverse_order_loop :
 		cmp ecx, datalength // check if end of data is reached
 		je reverse_bits_done // if yes, jump to invert bits
-		
+
 		//reverse bit order (section per byte)
 		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-		mov bl, byte ptr[edi+ecx] //load data from memory into eax //changed pointer to byte pointer & using lower register ~ Anthony
+		mov bl, byte ptr[edi + ecx] //load data from memory into eax //changed pointer to byte pointer & using lower register ~ Anthony
 		//mov bl, al - don't actually need this part
 		mov edx, 8 //changed to 8 bc 8 bits in a byte
 			reverse_loop:
 		ror bl, 1
 		rcl al, 1
 		dec edx
-		cmp edx,0 
+		cmp edx, 0
 		jne reverse_loop //loop uses ecx which we are already using so we will use jne and cmp edx instead
-		mov byte ptr[edi+ecx], al
-			
+		mov byte ptr[edi + ecx], al
+
 		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 		inc ecx //increment counter
 		jmp reverse_order_loop //repeat for next element
-			reverse_bits_done:
+			reverse_bits_done :
 		/**************************************************************************************************************************/
-		
+
 		/**************************************************************************************************************************
 		/*-----| Inverse Bits (Encrypt) CREDIT: Christina & Anthony |-----*/
 		xor eax, eax
@@ -187,8 +224,8 @@ void encryptData_01(char *data, int datalength)
 		xor ebx, ebx
 		xor edx, edx
 
-			
-			invert_bits_loop:
+
+			invert_bits_loop :
 		cmp ecx, datalength //check if end of data is reached
 		je invert_bits_done
 		//invert bits 0,2,4,7 (section per byte)
@@ -199,13 +236,11 @@ void encryptData_01(char *data, int datalength)
 		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 		inc ecx //increment counter
 		jmp invert_bits_loop //repeat for next element
-		invert_bits_done :
+			invert_bits_done :
 		/**************************************************************************************************************************/
 	}
-
 	return;
-} // encryptData_01
-
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // EXAMPLE code to to show how to access global variables
 int encryptData(char *data, int dataLength)

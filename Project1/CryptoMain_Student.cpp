@@ -69,7 +69,7 @@ char gInFileName[256];
 char gOutFileName[256];
 char gKeyFileName[256];
 int gOp = 0;			// 1 = encrypt, 2 = decrypt
-int gNumRounds = 1;
+int gNumRounds = 0;
 int gMilestone = 2;
 
 
@@ -106,7 +106,7 @@ int encryptFile(FILE *fptrIn, FILE *fptrOut)
 		break;
 
 	case 2:
-		//encryptData_02(buffer, filesize);	// comment out for student version
+		encryptData_02(buffer, filesize);	// comment out for student version
 		break;
 
 	case 3:
@@ -154,7 +154,7 @@ int decryptFile(FILE *fptrIn, FILE *fptrOut)
 		break;
 
 	case 2:
-		//decryptData_02(buffer, filesize);	// comment out for student version
+		decryptData_02(buffer, filesize);	// comment out for student version
 		break;
 
 	case 3:
