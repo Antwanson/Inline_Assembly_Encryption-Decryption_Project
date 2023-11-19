@@ -10,7 +10,7 @@
 
 void encryptData_01(char *data, int datalength)
 {
-
+	
 	__asm
 	{
 		xor ecx, ecx //clearing the ECX and EAX registers
@@ -122,7 +122,33 @@ void encryptData_01(char *data, int datalength)
 
 		/**************************************************************************************************************************/
 
-		//Code Table Swap
+		/**************************************************************************************************************************
+		/*-----| Code Table Swap (Encrypt) |-----*/
+		xor eax, eax
+		xor ecx, ecx
+		xor ebx, ebx
+
+			CTS_CHECK_NEXT :
+
+		cmp ecx, datalength //seeing if we are at the end of the data
+		je CTS_DONE
+
+			//Operations to do per byte
+		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		movzx eax, byte ptr[edi + ecx] //puts byte of plaintext into full register zero extended
+		lea ebx, gEncodeTable //gets the decrypt swap table
+
+		movzx eax, [ebx+eax] //swap the value
+
+		mov byte ptr[edi + ecx], al //write back to memory
+		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+		inc ecx
+		jmp CTS_CHECK_NEXT
+
+			CTS_DONE :
+
+		/**************************************************************************************************************************/
 
 		//Reverse bit order
 

@@ -19,7 +19,34 @@ void decryptData_01(char *data, int sized)
 
 		//Reverse bit order
 
-		//Code Table Swap
+		/**************************************************************************************************************************
+		/*-----| Code Table Swap (Decrypt) |-----*/
+		xor eax, eax
+		xor ecx, ecx
+		xor ebx, ebx
+
+		CTS_CHECK_NEXT :
+
+		cmp ecx, sized //seeing if we are at the end of the data
+			je CTS_DONE
+
+			//Operations to do per byte
+		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+			movzx eax, byte ptr[edi + ecx] //puts byte of plaintext into full register zero extended
+			lea ebx, gDecodeTable //gets the encrypt swap table
+
+			movzx eax, [ebx + eax] //swap the value
+
+			mov byte ptr[edi + ecx], al //write back from register
+
+		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+			inc ecx
+			jmp CTS_CHECK_NEXT
+
+			CTS_DONE :
+
+		/**************************************************************************************************************************/
 
 		/**************************************************************************************************************************
 		/*-----| Rotate 3 bits left (Decrypt) |-----*/
@@ -38,7 +65,7 @@ void decryptData_01(char *data, int sized)
 		je R3BL_SHIFT_COMPLETE // if all shifts are done jump to writing to memory
 
 		shr al, 1 //shift left 1
-		jnc R3BL_NOBIT // if carry flag is 1, adds 1 to al effectively rotating the bit to the other side
+		jnc R3BL_NOBIT // if carry flag is 1, adds 128 to al effectively rotating the bit to the other side
 		add al, 128
 			R3BL_NOBIT : // if there is not bit to carry
 		dec bl
