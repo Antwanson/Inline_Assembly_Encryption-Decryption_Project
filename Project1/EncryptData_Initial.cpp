@@ -46,7 +46,7 @@ void encryptData_01(char *data, int datalength)
 		//Start order BEACD 
 
 		/**************************************************************************************************************************
-		/*-----| Nibble rotate out (Encrypt) |-----*/
+		/*-----| Nibble rotate out (Encrypt) CREDIT: Anthony |-----*/
 
 		//mov edi, data //getting the actual data again (starting from beginning) aka ABCD EFGH
 		xor eax,eax
@@ -88,7 +88,7 @@ void encryptData_01(char *data, int datalength)
 		/**************************************************************************************************************************/
 
 		/**************************************************************************************************************************
-		/*-----| Rotate 3 bits left (Encrypt) |-----*/
+		/*-----| Rotate 3 bits left (Encrypt) CREDIT: Marinella & Anthony |-----*/
 		xor eax, eax
 		xor ecx, ecx
 		
@@ -123,7 +123,7 @@ void encryptData_01(char *data, int datalength)
 		/**************************************************************************************************************************/
 
 		/**************************************************************************************************************************
-		/*-----| Code Table Swap (Encrypt) |-----*/
+		/*-----| Code Table Swap (Encrypt) CREDIT: Anthony |-----*/
 		xor eax, eax
 		xor ecx, ecx
 		xor ebx, ebx
@@ -150,8 +150,35 @@ void encryptData_01(char *data, int datalength)
 
 		/**************************************************************************************************************************/
 
-		//Reverse bit order
+		/**************************************************************************************************************************
+		/*-----| Reverse Bit Order (Encrypt) CREDIT: Christina & Anthony |-----*/
+		xor eax, eax
+		xor ecx, ecx //using this instead of mov ecx,0 ~ Anthony
+		xor ebx, ebx
+		xor edx, edx
 
+			reverse_order_loop:
+		cmp ecx, datalength // check if end of data is reached
+		je invert_bits_done // if yes, jump to invert bits
+		
+		//reverse bit order (section per byte)
+		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		mov bl, byte ptr[edi+ecx] //load data from memory into eax //changed pointer to byte pointer & using lower register ~ Anthony
+		//mov bl, al - don't actually need this part
+		mov edx, 8 //changed to 8 bc 8 bits in a byte
+			reverse_loop:
+		ror bl, 1
+		rcl al, 1
+		dec edx
+		cmp edx,0 
+		jne reverse_loop //loop uses ecx which we are already using so we will use jne and cmp edx instead
+		mov byte ptr[edi+ecx], al
+			
+		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		inc ecx //increment counter
+		jmp reverse_order_loop //repeat for next element
+			invert_bits_done: 
+		/**************************************************************************************************************************/
 		//Invert Bits
 	}
 
