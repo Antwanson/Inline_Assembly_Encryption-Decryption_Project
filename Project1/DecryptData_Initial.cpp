@@ -244,7 +244,7 @@ void decryptData_02(char* data, int sized)
 
 	return;
 }
-void decryptData_03(char* data, int sized, int rounds)
+int decryptData_03(char* data, int sized)
 {
 	__asm
 	{
