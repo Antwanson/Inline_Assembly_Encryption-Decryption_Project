@@ -246,8 +246,18 @@ void decryptData_02(char* data, int sized)
 }
 int decryptData_03(char* data, int sized)
 {
+	int enc_round = gNumRounds;
 	__asm
 	{
+		//Start of round code
+		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		M3_Next_Round:
+		mov eax, enc_round
+		cmp eax, 0
+		je M3_Dec_Completed
+		dec eax
+		mov enc_round, eax
+		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 		mov edi, data //getting the actual data
 		//Start order BEACD in REVERSE 
 
@@ -415,31 +425,59 @@ int decryptData_03(char* data, int sized)
 		xor ecx, ecx //clearing the ECX and EAX registers
 		xor eax, eax
 		xor ebx, ebx
+		xor edx, edx
+		mov edi, data //getting the actual data
+
 		/***************************************************************************************************************************
-		* M1 Section - commented out to make checking M2 easier */
+		*-----| M1 & M3 Section -|- CREDIT: ANTHONY |-----*/
 
-		lea	esi, gPasswordHash //getting starting index
-		mov ah, byte ptr[esi]
-		mov al, byte ptr[esi + 1]
+		lea	esi, gPasswordHash //getting p hash
+
+		//	mov ah, byte ptr[esi]	Legacy version for comparison
+		//	mov al, byte ptr[esi + 1]
+		mov ebx, enc_round
+		nop
+		mov ah, byte ptr[esi + ebx * 4] //get starting index[round]
+		mov al, byte ptr[esi + 1 + ebx * 4]
+
+		mov dh, byte ptr[esi + 2 + ebx * 4]
+		mov dl, byte ptr[esi + 3 + ebx * 4]//Hop count moved into edx aka intitialized kinda
+
+		// if hop count is 0 then set it to 0xFFFF
+		cmp edx, 0
+		jne Hop_Not_Zero
+		mov edx, 0x0000FFFF
+			Hop_Not_Zero:
+
 		lea esi, gkey //getting gkey
-
-
-
-
-		CHECK_NEXT:
+			CHECK_NEXT :
 		mov bh, 0
 		cmp ecx, sized //seeing if we are at the end of the data
 		je DONE
+		//per every byte xor w/ gkey[index]
+		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		xor ebx, ebx
 		mov bl, byte ptr[edi + ecx] //moves X value into bl
 		mov bh, byte ptr[esi + eax] //moves gkey into bh
+
 		xor bl, bh
 		mov byte ptr[edi + ecx], bl //writes xor-ed value back into where we got it from
 		inc ecx //counter increment
+		add eax, edx //new M3 stuff (adding hop (edx) to index (eax))
+
+		cmp eax, 65537 //if index (eax) ever is greater or equal than 65537 sub 65537
+		jle Index_Not_Too_High
+		sub eax, 65537
+			Index_Not_Too_High:
+		//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 		jmp CHECK_NEXT
 
 			DONE :
-		/***************************************************************************************************************************/
 
+		/**************************************************************************************************************************/
+		
+		jmp	M3_Next_Round
+			M3_Dec_Completed ://when all rounds done
 
 	}
 
