@@ -69,7 +69,7 @@ char gInFileName[256];
 char gOutFileName[256];
 char gKeyFileName[256];
 int gOp = 0;			// 1 = encrypt, 2 = decrypt
-int gNumRounds = 5;
+int gNumRounds = 1;
 int gMilestone = 3;
 
 
